@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;500;600;700;800&family=Odibee+Sans&family=Press+Start+2P&display=swap');*/
 
 * html {
     padding: 0;
@@ -26,6 +27,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
 }
+
 .keep-scrolling {
     overflow-y: scroll; /* Add the ability to scroll y axis*/
 }
@@ -37,15 +39,18 @@ body {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .keep-scrolling {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
-*{
+
+* {
     -ms-overflow-style: none;
 }
+
 ::-webkit-scrollbar {
     display: none;
 }
+
 .app-container {
     min-height: 100vh;
     color: #fff;

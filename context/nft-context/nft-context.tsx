@@ -1,7 +1,7 @@
 import {ethers} from 'ethers'
 import React, {useContext, useEffect, useReducer, useState} from 'react'
 
-import {INFTContext} from "./nft-context-types";
+import {INFTContext, INFTItem} from "./nft-context-types";
 import {nftInitialState, nftReducer} from "./nft-context-reducer";
 import useLoadNFTs from "../../hooks/useLoadNFTs";
 import {nftaddress, nftmarketaddress} from "../../config";
@@ -12,8 +12,10 @@ import NetworkContext from "../network-context/network-context";
 const nftInitialContext: INFTContext = {
     nftState: nftInitialState,
     isLoadingNfts: false,
-    isProcessingBuyOrder: false,
+    isProcessingBuyOrder: [],
+    isProcessingRemoveOrder: [],
     buyNft: (nft) => null,
+    removeFromMarket: (nft) => null,
     reloadAllNftCollections: () => null
 }
 
@@ -26,11 +28,12 @@ export const NFTProvider = ({children}: { children: React.ReactNode }): JSX.Elem
     const [nftMyItems, isLoadingMyItems, loadMyItems] = useLoadNFTs('fetchMyNFTs');
     const [nftItemsCreated, isLoadingItemsCreated, loadItemsCreated] = useLoadNFTs('fetchItemsCreated');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState<boolean | number>(false);
+    const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState<number[]>([]);
+    const [isProcessingRemoveOrder, setIsProcessingRemoveOrder] = useState<number[]>([]);
     const {networkState} = useContext(NetworkContext);
     const buyNft = async (nft) => {
         try {
-            setIsProcessingBuyOrder(nft.itemId)
+            setIsProcessingBuyOrder([...isProcessingBuyOrder, nft.itemId])
             const signer = networkState.web3Provider.getSigner()
             const contract = new ethers.Contract(nftmarketaddress, Market.abi, signer)
             const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
@@ -39,9 +42,34 @@ export const NFTProvider = ({children}: { children: React.ReactNode }): JSX.Elem
             })
             await transaction.wait()
             reloadAllNftCollections()
-            setIsProcessingBuyOrder(false)
+            const indexOfItem = isProcessingBuyOrder.indexOf(nft.itemId);
+            const newInProcess = [...isProcessingBuyOrder].splice(indexOfItem, 1);
+            setIsProcessingBuyOrder(newInProcess)
         } catch (e) {
-            setIsProcessingBuyOrder(false)
+            const indexOfItem = isProcessingBuyOrder.indexOf(nft.itemId);
+            const newInProcess = [...isProcessingBuyOrder].splice(indexOfItem, 1);
+            setIsProcessingBuyOrder(newInProcess)
+        }
+    }
+
+    const removeFromMarket = async (nft: INFTItem) =>{
+        //todo:implement solidity contract to remove first
+        return;
+        try {
+            setIsProcessingRemoveOrder([...isProcessingRemoveOrder, nft.itemId])
+            const signer = networkState.web3Provider.getSigner()
+            const contract = new ethers.Contract(nftmarketaddress, Market.abi, signer)
+            // const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
+            const transaction = await contract.removeMarketItem(nftaddress, nft.itemId)
+            await transaction.wait()
+            reloadAllNftCollections()
+            const indexOfItem = isProcessingRemoveOrder.indexOf(nft.itemId);
+            const newInProcess = [...isProcessingRemoveOrder].splice(indexOfItem, 1);
+            setIsProcessingRemoveOrder(newInProcess)
+        } catch (e) {
+            const indexOfItem = isProcessingRemoveOrder.indexOf(nft.itemId);
+            const newInProcess = [...isProcessingRemoveOrder].splice(indexOfItem, 1);
+            setIsProcessingRemoveOrder(newInProcess)
         }
     }
     const reloadAllNftCollections = () => {
@@ -77,6 +105,8 @@ export const NFTProvider = ({children}: { children: React.ReactNode }): JSX.Elem
                 nftState,
                 isLoadingNfts: isLoading,
                 isProcessingBuyOrder,
+                isProcessingRemoveOrder,
+                removeFromMarket,
                 buyNft,
                 reloadAllNftCollections
             }}>{children}</NFTContext.Provider>)

@@ -14,8 +14,10 @@ export interface INFTItem {
 export interface INFTContext {
     nftState: INFTState
     isLoadingNfts: boolean,
-    isProcessingBuyOrder:boolean | number,
+    isProcessingBuyOrder: number[],
+    isProcessingRemoveOrder: number[],
     buyNft: (nft: INFTItem) => void;
+    removeFromMarket: (nft: INFTItem) => void;
     reloadAllNftCollections: () => void;
 }
 

@@ -58,7 +58,7 @@ contract Market is ReentrancyGuard {
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
 
-        idToMarketItem[itemId] =  MarketItem(
+        idToMarketItem[itemId] = MarketItem(
             itemId,
             nftContract,
             tokenId,
@@ -97,6 +97,21 @@ contract Market is ReentrancyGuard {
         idToMarketItem[itemId].sold = true;
         _itemsSold.increment();
         payable(owner).transfer(listingPrice);
+    }
+
+    /* Creates the removal of a marketplace item */
+    /* Transfers ownership of the item */
+    function removeMarketItem(
+        address nftContract,
+        uint256 itemId
+    ) public payable nonReentrant {
+        //        uint price = idToMarketItem[itemId].price;
+        uint tokenId = idToMarketItem[itemId].tokenId;
+        require(msg.sender == idToMarketItem[itemId].seller, "Only the owner can remove item");
+        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
+        idToMarketItem[itemId].owner = payable(msg.sender);
+        idToMarketItem[itemId].sold = true;
+
     }
 
     /* Returns all unsold market items */

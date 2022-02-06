@@ -14,7 +14,7 @@ import Market from '../artifacts/contracts/Market.sol/Market.json'
 import NetworkContext from "../context/network-context/network-context";
 import NFTContext from "../context/nft-context/nft-context";
 import ProgressBar from 'react-bootstrap/ProgressBar'
-import Loader from "../components/loader/loader";
+import {Button, Image, Loader, Progress} from "semantic-ui-react";
 
 const CreateItem = () => {
     const [fileUrl, setFileUrl] = useState(null)
@@ -143,13 +143,15 @@ const CreateItem = () => {
                 />
                 {
                     fileUrl && (
-                        <img className="rounded mt-4" width="350" src={fileUrl}/>
+                        <Image className="my-4" centered size={'big'} src={fileUrl}/>
                     )
                 }
-                <button onClick={createMarket} className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg">
-                    {isLoading ? <Loader/> : `Create Digital Asset ${isUploading ? currentUploadProgress + '%' : ''}`}
-                </button>
-                {isUploading && <ProgressBar striped variant="danger" now={currentUploadProgress}/>}
+                <Button onClick={createMarket} color={'pink'} size={'massive'}
+                        className={`font-bold ${isLoading || isUploading ? 'animate-pulse' : ''}`} loading={isLoading}
+                        content={isLoading ? 'awaiting blocks' : isUploading ? 'Create Digital Asset ' + currentUploadProgress + '%' : 'Create Digital Asset'}>
+                </Button>
+                {/*{isUploading && <ProgressBar striped variant="danger" now={currentUploadProgress}/>}*/}
+                {isUploading && <Progress percent={currentUploadProgress} color='green'/>}
 
             </div>
         </div>
